@@ -1,0 +1,29 @@
+language: java
+jdk:
+- oraclejdk8
+addons:
+  apt:
+    packages:
+    - oracle-java8-installer
+cache:
+  directories:
+  - "$HOME/.m2"
+install: echo Install phase has been disabled as a complete build is run during deployment
+script: mvn package
+branches:
+  only:
+  - master
+notifications:
+  email:
+    recipients:
+    - vatbub123+travisbuildnotification@googlemail.com
+    on_success: never
+on_failure: always
+deploy:
+  provider: heroku
+  app: vatbubgitreports
+  skip_cleanup: true
+  on:
+    repo: vatbub/vatbubgitreports2
+  api_key:
+    secure: Q0hfErm498CgiwMIz/n7Un6wdgewRPTXhDd2Z1C/RGHJe95s8aYC+AEffh2T+pEsmgCFvUqN/SVgjfOvEei7R5yaQYAooGOnfkYNk2q9A0CNYgB7WxmE65OQI+YZLcGUVLO0dWISBQLBPfeYJgIKBHfYSnDTnMCc4rXI4C/dfmgNGBs7t49VaNao8k/Pv5NIpSBpaYnfhNcCMU0t7XzlkeTs4Wh0Yc8Xe2LFwyROPonm1HdQh7eCJgUAMILzA5kbcr+gxCUISumwW6JgKBPIcTDwpHxAnLNUeqF7nFaFnHFUCXcqPuiQFD9NJz8n+Wh/PDdBKE5AyCE09Uqa6d16fEXrMzcgIqThwL0JyjV7V6LaRFGuAU7I2/918apb1LBSrBTFoh25qjGrlohRBC2JM9TFIOkkycbEgYQVUsOl4LpSjVmq8HWbalJtGqNJ7fsCFSkUTmqEvSMd1yPBOEyIK4YLAtnoI4d1FNtDn183oBzUSgA5EbkTC3kr4wNGp/aRsf01ht0u/CNvvqugjFI8IIhLtJFZQti9ySL9TorAnR3fF3Lc4vFuH/u2r4+AVa4A5WudUYdnHq3Hyc4Q5YIEQxQDT/WsIGPGbzFVKsTQ42ajhkcvJVXO/m7E2JVOHuOv+Mu7i1+Aom5I2n92m+UMAVaemgiNUp4ZZsiL63KsVFE=
