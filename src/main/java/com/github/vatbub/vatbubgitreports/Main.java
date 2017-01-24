@@ -160,7 +160,7 @@ public class Main extends HttpServlet {
             Error error = new Error(e.getClass().getName() + " occurred while parsing the request", ExceptionUtils.getFullStackTrace(e));
             writer.write(gson.toJson(error));
             response.setStatus(500);
-            sendErrorMail("ForwardToIFTTT", requestBody.toString(), e);
+            sendErrorMail("ForwardToGitHub", requestBody.toString(), e);
             return;
         }
 
