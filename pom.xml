@@ -161,6 +161,14 @@
                             <token>githubAccessToken</token>
                             <value>${env.GITHUB_ACCESS_TOKEN}</value>
                         </replacement>
+                        <replacement>
+                            <token>githubUserName</token>
+                            <value>${env.GITHUB_USER_NAME}</value>
+                        </replacement>
+                        <replacement>
+                            <token>githubPassword</token>
+                            <value>${env.GITHUB_PASSWORD}</value>
+                        </replacement>
                     </replacements>
                 </configuration>
             </plugin>

@@ -125,9 +125,9 @@ public class Main extends HttpServlet {
 
         // Authenticate on GitHub
         GitHubClient client = new GitHubClient();
-        client.setOAuth2Token(properties.getProperty("GitHub_AccessToken"));
+        client.setCredentials(properties.getProperty("GitHub_UserName"), properties.getProperty("GitHub_Password"));
 
-        // Convert the isue object
+        // Convert the issue object
         Issue issue = new Issue();
         issue.setTitle(gitHubIssue.getTitle());
         String body = "";
