@@ -61,7 +61,7 @@ public class Main extends HttpServlet {
         if (properties == null) {
             properties = new Properties();
             try {
-                properties.load(getClass().getResourceAsStream("application.properties"));
+                properties.load(getClass().getResourceAsStream("/application.properties"));
             } catch (IOException e) {
                 sendErrorMail("readProperties", "Unable not read application properties", e);
                 e.printStackTrace();
@@ -135,7 +135,7 @@ public class Main extends HttpServlet {
             body = body + "Reporter email: " + gitHubIssue.getReporterEmail() + "\n";
             metadataGiven = true;
         }
-        if (!gitHubIssue.getLogLocation().equals("")) {
+        if (gitHubIssue.getLogLocation()!=null) {
             body = body + "Log location: " + gitHubIssue.getLogLocation() + "\n";
             metadataGiven = true;
         }
