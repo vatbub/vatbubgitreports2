@@ -191,7 +191,7 @@ public class Main extends HttpServlet {
             message.setFrom(new InternetAddress(username));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(toAddress));
-            message.setSubject("[iftttEventFilter] An error occurred in your application");
+            message.setSubject("[vatbubgitreports] An error occurred in your application");
             message.setText("Exception occurred in phase: " + phase + "\n\nRequest that caused the exception:\n" + requestBody
                     + "\n\nStacktrace of the exception:\n" + ExceptionUtils.getFullStackTrace(e));
 
