@@ -53,6 +53,7 @@ public class Main extends HttpServlet {
                     "</html>");
         } catch (IOException e) {
             e.printStackTrace();
+            response.setStatus(500);
         }
     }
 
@@ -65,6 +66,7 @@ public class Main extends HttpServlet {
             } catch (IOException e) {
                 sendErrorMail("readProperties", "Unable not read application properties", e);
                 e.printStackTrace();
+                response.setStatus(500);
                 return;
             }
         }
@@ -81,6 +83,7 @@ public class Main extends HttpServlet {
         } catch (IOException e) {
             sendErrorMail("getWriter", "Unable not read request", e);
             e.printStackTrace();
+            response.setStatus(500);
             return;
         }
 
@@ -92,6 +95,7 @@ public class Main extends HttpServlet {
         } catch (IOException e) {
             Error error = new Error(e.getClass().getName() + " occurred while reading the request", ExceptionUtils.getFullStackTrace(e));
             writer.write(gson.toJson(error));
+            response.setStatus(500);
             sendErrorMail("ReadRequestBody", requestBody.toString(), e);
             return;
         }
@@ -115,6 +119,7 @@ public class Main extends HttpServlet {
             sendErrorMail("ParseJSON", requestBody.toString(), e);
             Error error = new Error(e.getClass().getName() + " occurred while parsing the request", ExceptionUtils.getFullStackTrace(e));
             writer.write(gson.toJson(error));
+            response.setStatus(500);
             return;
         }
 
@@ -154,6 +159,7 @@ public class Main extends HttpServlet {
             e.printStackTrace();
             Error error = new Error(e.getClass().getName() + " occurred while parsing the request", ExceptionUtils.getFullStackTrace(e));
             writer.write(gson.toJson(error));
+            response.setStatus(500);
             sendErrorMail("ForwardToIFTTT", requestBody.toString(), e);
             return;
         }
