@@ -151,7 +151,7 @@ public class Main extends HttpServlet {
             new IssueService(client).createIssue(gitHubIssue.getToRepo_Owner(), gitHubIssue.getToRepo_RepoName(), issue);
             res.passed = true;
         } catch (IOException e) {
-            // Will only happen if I did a typo above
+            e.printStackTrace();
             Error error = new Error(e.getClass().getName() + " occurred while parsing the request", ExceptionUtils.getFullStackTrace(e));
             writer.write(gson.toJson(error));
             sendErrorMail("ForwardToIFTTT", requestBody.toString(), e);
