@@ -158,7 +158,6 @@ public class Main extends HttpServlet {
             return;
         }
 
-        // Tell IFTTT the result of the operation
         writer.write(gson.toJson(res));
     }
 
