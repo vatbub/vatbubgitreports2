@@ -134,44 +134,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>replace</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <file>target/classes/application.properties</file>
-                    <replacements>
-                        <replacement>
-                            <token>githubClientId</token>
-                            <value>${env.GITHUB_CLIENT_ID}</value>
-                        </replacement>
-                        <replacement>
-                            <token>githubSecret</token>
-                            <value>${env.GITHUB_SECRET}</value>
-                        </replacement>
-                        <replacement>
-                            <token>githubAccessToken</token>
-                            <value>${env.GITHUB_ACCESS_TOKEN}</value>
-                        </replacement>
-                        <replacement>
-                            <token>githubUserName</token>
-                            <value>${env.GITHUB_USER_NAME}</value>
-                        </replacement>
-                        <replacement>
-                            <token>githubPassword</token>
-                            <value>${env.GITHUB_PASSWORD}</value>
-                        </replacement>
-                    </replacements>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>

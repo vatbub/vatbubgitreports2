@@ -52,7 +52,6 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 public class Main extends HttpServlet {
-    private static Properties properties = null;
     private static URL gitHubApiURL;
 
     static {
@@ -79,19 +78,6 @@ public class Main extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        // load properties
-        if (properties == null) {
-            properties = new Properties();
-            try {
-                properties.load(getClass().getResourceAsStream("/application.properties"));
-            } catch (IOException e) {
-                sendErrorMail("readProperties", "Unable not read application properties", e);
-                e.printStackTrace();
-                response.setStatus(500);
-                return;
-            }
-        }
-
         response.setContentType("application/json");
         PrintWriter writer;
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -199,7 +185,7 @@ public class Main extends HttpServlet {
 
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpPost httpPost = new HttpPost(finalGitHubURL.toString());
-                httpPost.addHeader("Authorization", "token " + properties.getProperty("GitHub_AccessToken"));
+                httpPost.addHeader("Authorization", "token " + System.getenv("GITHUB_ACCESS_TOKEN"));
                 HttpEntity entity = new ByteArrayEntity(query.getBytes("UTF-8"));
                 httpPost.setEntity(entity);
 
