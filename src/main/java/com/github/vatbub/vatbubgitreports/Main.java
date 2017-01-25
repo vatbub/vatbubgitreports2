@@ -23,7 +23,6 @@ package com.github.vatbub.vatbubgitreports;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import common.Common;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -39,12 +38,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.util.Properties;
 
 
 public class Main extends HttpServlet {
-    private static Properties properties = null;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -61,19 +58,6 @@ public class Main extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
-        // load properties
-        if (properties == null) {
-            properties = new Properties();
-            try {
-                properties.load(getClass().getResourceAsStream("/application.properties"));
-            } catch (IOException e) {
-                sendErrorMail("readProperties", "Unable not read application properties", e);
-                e.printStackTrace();
-                response.setStatus(500);
-                return;
-            }
-        }
-
         response.setContentType("application/json");
         PrintWriter writer;
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -128,7 +112,7 @@ public class Main extends HttpServlet {
 
         // Authenticate on GitHub
         GitHubClient client = new GitHubClient();
-        client.setCredentials(properties.getProperty("GitHub_UserName"), properties.getProperty("GitHub_Password"));
+        client.setOAuth2Token(System.getenv("GITHUB_ACCESS_TOKEN"));
 
         // Convert the issue object
         Issue issue = new Issue();
@@ -143,7 +127,7 @@ public class Main extends HttpServlet {
             body = body + "Reporter email: " + gitHubIssue.getReporterEmail() + "\n";
             metadataGiven = true;
         }
-        if (gitHubIssue.getLogLocation()!=null) {
+        if (gitHubIssue.getLogLocation() != null) {
             body = body + "Log location: " + gitHubIssue.getLogLocation() + "\n";
             metadataGiven = true;
         }
