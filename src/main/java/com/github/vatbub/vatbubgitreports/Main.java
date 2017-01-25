@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -148,7 +149,7 @@ public class Main extends HttpServlet {
             body = body + "Reporter email: " + gitHubIssue.getReporterEmail() + "\n";
             metadataGiven = true;
         }
-        if (gitHubIssue.getLogLocation()!=null) {
+        if (gitHubIssue.getLogLocation() != null) {
             body = body + "Log location: " + gitHubIssue.getLogLocation() + "\n";
             metadataGiven = true;
         }
@@ -179,6 +180,23 @@ public class Main extends HttpServlet {
                 connection.getOutputStream().flush();
                 connection.getOutputStream().close();
                 response.setStatus(connection.getResponseCode());
+                // check the server response
+                int responseCode = 0;
+                StringBuilder responseBody = new StringBuilder();
+
+                BufferedReader br;
+                if (200 <= connection.getResponseCode() && connection.getResponseCode() <= 299) {
+                    br = new BufferedReader(new InputStreamReader((connection.getInputStream())));
+                } else {
+                    br = new BufferedReader(new InputStreamReader((connection.getErrorStream())));
+                }
+
+                while ((line = br.readLine()) != null) {
+                    responseBody.append(line);
+                }
+
+                FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
+                FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + responseBody);
             } catch (IOException e) {
                 FOKLogger.log(ReportingDialog.class.getName(), Level.SEVERE, "An error occurred", e);
             }
