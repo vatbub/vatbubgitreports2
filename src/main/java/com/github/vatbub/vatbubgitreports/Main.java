@@ -26,13 +26,6 @@ import com.google.gson.GsonBuilder;
 import common.Common;
 import logging.FOKLogger;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import reporting.GitHubIssue;
 import view.reporting.ReportingDialog;
 
@@ -43,15 +36,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Level;
 
 public class Main extends HttpServlet {
+    private static Properties properties = null;
     private static URL gitHubApiURL;
 
     static {
@@ -78,6 +73,19 @@ public class Main extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
+        // load properties
+        if (properties == null) {
+            properties = new Properties();
+            try {
+                properties.load(getClass().getResourceAsStream("/application.properties"));
+            } catch (IOException e) {
+                sendErrorMail("readProperties", "Unable not read application properties", e);
+                e.printStackTrace();
+                response.setStatus(500);
+                return;
+            }
+        }
+
         response.setContentType("application/json");
         PrintWriter writer;
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -158,13 +166,13 @@ public class Main extends HttpServlet {
         try {
             URL finalGitHubURL = new URL(gitHubApiURL.toString() + "/repos/" + gitHubIssue.getToRepo_Owner() + "/" + gitHubIssue.getToRepo_RepoName());
             try {
-                //HttpURLConnection connection = (HttpURLConnection) finalGitHubURL.openConnection();
+                HttpURLConnection connection = (HttpURLConnection) finalGitHubURL.openConnection();
 
                 // build the request body
                 String query = gson.toJson(issue);
 
                 // request header
-                /*connection.setRequestMethod("POST");
+                connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Content-Encoding", "UTF-8");
                 connection.setRequestProperty("Content-Length", Integer.toString(query.length()));
@@ -172,44 +180,29 @@ public class Main extends HttpServlet {
                 connection.setDoOutput(true);
                 connection.getOutputStream().write(query.getBytes("UTF8"));
                 connection.getOutputStream().flush();
-                connection.getOutputStream().close();*/
+                connection.getOutputStream().close();
+                response.setStatus(connection.getResponseCode());
+                // check the server response
+                int responseCode = connection.getResponseCode();
+                StringBuilder responseBody = new StringBuilder();
 
-                /*Request gitHubRequest = Request.Post(finalGitHubURL.toString())
-                        .addHeader("Authorization", "token " + properties.getProperty("GitHub_AccessToken"))
-                        .bodyString(query, ContentType.APPLICATION_JSON);
-                Response gitHubResponse = gitHubRequest.execute();*/
-
-                System.setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
-                System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
-                System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "DEBUG");
-
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-                HttpPost httpPost = new HttpPost(finalGitHubURL.toString());
-                httpPost.addHeader("Authorization", "token " + System.getenv("GITHUB_ACCESS_TOKEN"));
-                HttpEntity entity = new ByteArrayEntity(query.getBytes("UTF-8"));
-                httpPost.setEntity(entity);
-
-                int responseCode;
-                String gitHubResponseAsString;
-                try (CloseableHttpResponse gitHubResponse = httpClient.execute(httpPost)) {
-                    // check the server response
-                    HttpEntity gitHubResponseEntity = gitHubResponse.getEntity();
-                    responseCode = gitHubResponse.getStatusLine().getStatusCode();
-                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    gitHubResponse.getEntity().writeTo(os);
-                    gitHubResponseAsString = new String(os.toByteArray(),"UTF-8");
-                    // responseBody = EntityUtils.toString(gitHubResponseEntity);
-                    EntityUtils.consume(gitHubResponseEntity);
+                BufferedReader br;
+                if (200 <= responseCode && responseCode <= 299) {
+                    br = new BufferedReader(new InputStreamReader((connection.getInputStream())));
+                } else {
+                    br = new BufferedReader(new InputStreamReader((connection.getErrorStream())));
                 }
 
-                response.setStatus(responseCode);
+                while ((line = br.readLine()) != null) {
+                    responseBody.append(line);
+                }
 
                 FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
-                FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + gitHubResponseAsString);
+                FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + responseBody);
 
                 if (responseCode >= 400) {
                     // something went wrong
-                    sendErrorMail("ForwardToGitHub", requestBody.toString(), "Response from GitHub (Status " + responseCode + "):\n" + gitHubResponseAsString);
+                    sendErrorMail("ForwardToGitHub", requestBody.toString(), "Response from GitHub (Status " + responseCode + "):\n" + responseBody);
                 }
             } catch (IOException e) {
                 FOKLogger.log(ReportingDialog.class.getName(), Level.SEVERE, "An error occurred", e);
