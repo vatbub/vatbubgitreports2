@@ -23,6 +23,7 @@ package com.github.vatbub.vatbubgitreports;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import common.Common;
 import logging.FOKLogger;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import reporting.GitHubIssue;
@@ -49,6 +50,7 @@ public class Main extends HttpServlet {
     private static URL gitHubApiURL;
 
     static {
+        Common.setAppName("vatbubgitreports");
         try {
             gitHubApiURL = new URL("https://api.github.com/");
         } catch (MalformedURLException e) {
