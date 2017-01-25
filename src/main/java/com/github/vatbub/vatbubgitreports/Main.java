@@ -199,6 +199,11 @@ public class Main extends HttpServlet {
 
                 FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
                 FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + responseBody);
+
+                if (responseCode >= 400) {
+                    // something went wrong
+                    sendErrorMail("ForwardToGitHub", requestBody.toString(), "Response from GitHub (Status " + responseCode + "):\n" + responseBody);
+                }
             } catch (IOException e) {
                 FOKLogger.log(ReportingDialog.class.getName(), Level.SEVERE, "An error occurred", e);
             }
@@ -216,6 +221,10 @@ public class Main extends HttpServlet {
     }
 
     private void sendErrorMail(String phase, String requestBody, Throwable e) {
+        sendErrorMail(phase, requestBody, "Stacktrace of the exception:" + ExceptionUtils.getFullStackTrace(e));
+    }
+
+    private void sendErrorMail(String phase, String requestBody, String errorInfoMessage) {
         final String username = "vatbubissues@gmail.com";
         final String password = "cfgtzhbnvfcdre456780uijhzgt67876ztghjkio897uztgfv";
         final String toAddress = "vatbub123+automatederrorreports@gmail.com";
@@ -241,7 +250,7 @@ public class Main extends HttpServlet {
                     InternetAddress.parse(toAddress));
             message.setSubject("[vatbubgitreports] An error occurred in your application");
             message.setText("Exception occurred in phase: " + phase + "\n\nRequest that caused the exception:\n" + requestBody
-                    + "\n\nStacktrace of the exception:\n" + ExceptionUtils.getFullStackTrace(e));
+                    + "\n\n" + errorInfoMessage);
 
             Transport.send(message);
 
