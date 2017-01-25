@@ -183,11 +183,11 @@ public class Main extends HttpServlet {
                 connection.getOutputStream().close();
                 response.setStatus(connection.getResponseCode());
                 // check the server response
-                int responseCode = 0;
+                int responseCode = connection.getResponseCode();
                 StringBuilder responseBody = new StringBuilder();
 
                 BufferedReader br;
-                if (200 <= connection.getResponseCode() && connection.getResponseCode() <= 299) {
+                if (200 <= responseCode && responseCode <= 299) {
                     br = new BufferedReader(new InputStreamReader((connection.getInputStream())));
                 } else {
                     br = new BufferedReader(new InputStreamReader((connection.getErrorStream())));
