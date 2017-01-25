@@ -187,9 +187,9 @@ public class Main extends HttpServlet {
                         .bodyString(query, ContentType.APPLICATION_JSON);
                 Response gitHubResponse = gitHubRequest.execute();
 
-                response.setStatus(gitHubResponse.returnResponse().getStatusLine().getStatusCode());
                 // check the server response
                 int responseCode = gitHubResponse.returnResponse().getStatusLine().getStatusCode();
+                response.setStatus(responseCode);
                 String responseBody = gitHubResponse.returnContent().asString();
 
                 FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
