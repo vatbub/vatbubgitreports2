@@ -193,10 +193,12 @@ public class Main extends HttpServlet {
                         .bodyString(query, ContentType.APPLICATION_JSON);
                 Response gitHubResponse = gitHubRequest.execute();*/
 
+                System.setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
+                System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
+                System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.wire", "DEBUG");
+
                 CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpPost httpPost = new HttpPost(finalGitHubURL.toString());
-                System.out.println("The following request will be sent to GitHub:");
-                httpPost.getEntity().writeTo(System.out);
                 httpPost.addHeader("Authorization", "token " + properties.getProperty("GitHub_AccessToken"));
                 HttpEntity entity = new ByteArrayEntity(query.getBytes("UTF-8"));
                 httpPost.setEntity(entity);
