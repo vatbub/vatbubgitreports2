@@ -26,9 +26,13 @@ import com.google.gson.GsonBuilder;
 import common.Common;
 import logging.FOKLogger;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import reporting.GitHubIssue;
 import view.reporting.ReportingDialog;
 
@@ -182,15 +186,29 @@ public class Main extends HttpServlet {
                 connection.getOutputStream().write(query.getBytes("UTF8"));
                 connection.getOutputStream().flush();
                 connection.getOutputStream().close();*/
-                Request gitHubRequest = Request.Post(finalGitHubURL.toString())
+
+                /*Request gitHubRequest = Request.Post(finalGitHubURL.toString())
                         .addHeader("Authorization", "token " + properties.getProperty("GitHub_AccessToken"))
                         .bodyString(query, ContentType.APPLICATION_JSON);
-                Response gitHubResponse = gitHubRequest.execute();
+                Response gitHubResponse = gitHubRequest.execute();*/
 
-                // check the server response
-                int responseCode = gitHubResponse.returnResponse().getStatusLine().getStatusCode();
+                CloseableHttpClient httpclient = HttpClients.createDefault();
+                HttpPost httpPost = new HttpPost(finalGitHubURL.toString());
+                httpPost.addHeader("Authorization", "token " + properties.getProperty("GitHub_AccessToken"));
+                HttpEntity entity = new ByteArrayEntity(query.getBytes("UTF-8"));
+                httpPost.setEntity(entity);
+
+                int responseCode;
+                String responseBody;
+                try (CloseableHttpResponse gitHubResponse = httpclient.execute(httpPost)) {
+                    // check the server response
+                    HttpEntity gitHubResponseEntity = gitHubResponse.getEntity();
+                    responseCode = gitHubResponse.getStatusLine().getStatusCode();
+                    responseBody = EntityUtils.toString(gitHubResponseEntity);
+                    EntityUtils.consume(gitHubResponseEntity);
+                }
+
                 response.setStatus(responseCode);
-                String responseBody = gitHubResponse.returnContent().asString();
 
                 FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
                 FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + responseBody);
