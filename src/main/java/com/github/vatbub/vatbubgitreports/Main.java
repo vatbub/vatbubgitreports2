@@ -24,10 +24,11 @@ package com.github.vatbub.vatbubgitreports;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import common.Common;
-import logging.FOKLogger;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.IssueService;
 import reporting.GitHubIssue;
-import view.reporting.ReportingDialog;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -37,26 +38,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Properties;
-import java.util.logging.Level;
+
 
 public class Main extends HttpServlet {
     private static Properties properties = null;
-    private static URL gitHubApiURL;
-
-    static {
-        Common.setAppName("vatbubgitreports");
-        try {
-            gitHubApiURL = new URL("https://api.github.com/");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -138,6 +126,10 @@ public class Main extends HttpServlet {
             return;
         }
 
+        // Authenticate on GitHub
+        GitHubClient client = new GitHubClient();
+        client.setCredentials(properties.getProperty("GitHub_UserName"), properties.getProperty("GitHub_Password"));
+
         // Convert the issue object
         Issue issue = new Issue();
         issue.setTitle(gitHubIssue.getTitle());
@@ -151,7 +143,7 @@ public class Main extends HttpServlet {
             body = body + "Reporter email: " + gitHubIssue.getReporterEmail() + "\n";
             metadataGiven = true;
         }
-        if (gitHubIssue.getLogLocation() != null) {
+        if (gitHubIssue.getLogLocation()!=null) {
             body = body + "Log location: " + gitHubIssue.getLogLocation() + "\n";
             metadataGiven = true;
         }
@@ -164,49 +156,7 @@ public class Main extends HttpServlet {
 
         // send the issue to GitHub
         try {
-            URL finalGitHubURL = new URL(gitHubApiURL.toString() + "/repos/" + gitHubIssue.getToRepo_Owner() + "/" + gitHubIssue.getToRepo_RepoName());
-            try {
-                HttpURLConnection connection = (HttpURLConnection) finalGitHubURL.openConnection();
-
-                // build the request body
-                String query = gson.toJson(issue);
-
-                // request header
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Content-Encoding", "UTF-8");
-                connection.setRequestProperty("Content-Length", Integer.toString(query.length()));
-                connection.setRequestProperty("Authorization", "token " + properties.getProperty("GitHub_AccessToken"));
-                connection.setDoOutput(true);
-                connection.getOutputStream().write(query.getBytes("UTF8"));
-                connection.getOutputStream().flush();
-                connection.getOutputStream().close();
-                response.setStatus(connection.getResponseCode());
-                // check the server response
-                int responseCode = connection.getResponseCode();
-                StringBuilder responseBody = new StringBuilder();
-
-                BufferedReader br;
-                if (200 <= responseCode && responseCode <= 299) {
-                    br = new BufferedReader(new InputStreamReader((connection.getInputStream())));
-                } else {
-                    br = new BufferedReader(new InputStreamReader((connection.getErrorStream())));
-                }
-
-                while ((line = br.readLine()) != null) {
-                    responseBody.append(line);
-                }
-
-                FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
-                FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + responseBody);
-
-                if (responseCode >= 400) {
-                    // something went wrong
-                    sendErrorMail("ForwardToGitHub", requestBody.toString(), "Response from GitHub (Status " + responseCode + "):\n" + responseBody);
-                }
-            } catch (IOException e) {
-                FOKLogger.log(ReportingDialog.class.getName(), Level.SEVERE, "An error occurred", e);
-            }
+            new IssueService(client).createIssue(gitHubIssue.getToRepo_Owner(), gitHubIssue.getToRepo_RepoName(), issue);
             res.passed = true;
         } catch (IOException e) {
             e.printStackTrace();
@@ -221,10 +171,6 @@ public class Main extends HttpServlet {
     }
 
     private void sendErrorMail(String phase, String requestBody, Throwable e) {
-        sendErrorMail(phase, requestBody, "Stacktrace of the exception:" + ExceptionUtils.getFullStackTrace(e));
-    }
-
-    private void sendErrorMail(String phase, String requestBody, String errorInfoMessage) {
         final String username = "vatbubissues@gmail.com";
         final String password = "cfgtzhbnvfcdre456780uijhzgt67876ztghjkio897uztgfv";
         final String toAddress = "vatbub123+automatederrorreports@gmail.com";
@@ -250,7 +196,7 @@ public class Main extends HttpServlet {
                     InternetAddress.parse(toAddress));
             message.setSubject("[vatbubgitreports] An error occurred in your application");
             message.setText("Exception occurred in phase: " + phase + "\n\nRequest that caused the exception:\n" + requestBody
-                    + "\n\n" + errorInfoMessage);
+                    + "\n\nStacktrace of the exception:\n" + ExceptionUtils.getFullStackTrace(e));
 
             Transport.send(message);
 
