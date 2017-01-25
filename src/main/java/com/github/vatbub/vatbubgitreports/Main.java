@@ -86,7 +86,6 @@ public class Main extends HttpServlet {
             sendErrorMail("ReadRequestBody", requestBody.toString(), e);
             return;
         }
-        Passed res = new Passed();
 
         // parse the request
         if (!request.getContentType().equals("application/json")) {
@@ -141,7 +140,6 @@ public class Main extends HttpServlet {
         // send the issue to GitHub
         try {
             new IssueService(client).createIssue(gitHubIssue.getToRepo_Owner(), gitHubIssue.getToRepo_RepoName(), issue);
-            res.passed = true;
         } catch (IOException e) {
             e.printStackTrace();
             Error error = new Error(e.getClass().getName() + " occurred while parsing the request", ExceptionUtils.getFullStackTrace(e));
@@ -151,7 +149,7 @@ public class Main extends HttpServlet {
             return;
         }
 
-        writer.write(gson.toJson(res));
+        writer.write(gson.toJson(issue));
     }
 
     private void sendErrorMail(String phase, String requestBody, Throwable e) {
@@ -189,10 +187,6 @@ public class Main extends HttpServlet {
         } catch (MessagingException e2) {
             throw new RuntimeException(e2);
         }
-    }
-
-    class Passed {
-        boolean passed;
     }
 
     class Error {
