@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -201,23 +202,26 @@ public class Main extends HttpServlet {
                 httpPost.setEntity(entity);
 
                 int responseCode;
-                String responseBody;
+                String gitHubResponseAsString;
                 try (CloseableHttpResponse gitHubResponse = httpClient.execute(httpPost)) {
                     // check the server response
                     HttpEntity gitHubResponseEntity = gitHubResponse.getEntity();
                     responseCode = gitHubResponse.getStatusLine().getStatusCode();
-                    responseBody = EntityUtils.toString(gitHubResponseEntity);
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    gitHubResponse.getEntity().writeTo(os);
+                    gitHubResponseAsString = new String(os.toByteArray(),"UTF-8");
+                    // responseBody = EntityUtils.toString(gitHubResponseEntity);
                     EntityUtils.consume(gitHubResponseEntity);
                 }
 
                 response.setStatus(responseCode);
 
                 FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
-                FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + responseBody);
+                FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + gitHubResponseAsString);
 
                 if (responseCode >= 400) {
                     // something went wrong
-                    sendErrorMail("ForwardToGitHub", requestBody.toString(), "Response from GitHub (Status " + responseCode + "):\n" + responseBody);
+                    sendErrorMail("ForwardToGitHub", requestBody.toString(), "Response from GitHub (Status " + responseCode + "):\n" + gitHubResponseAsString);
                 }
             } catch (IOException e) {
                 FOKLogger.log(ReportingDialog.class.getName(), Level.SEVERE, "An error occurred", e);
