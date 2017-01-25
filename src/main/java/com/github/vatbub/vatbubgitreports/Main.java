@@ -26,6 +26,9 @@ import com.google.gson.GsonBuilder;
 import common.Common;
 import logging.FOKLogger;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.client.fluent.Response;
+import org.apache.http.entity.ContentType;
 import reporting.GitHubIssue;
 import view.reporting.ReportingDialog;
 
@@ -37,9 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
@@ -166,13 +167,13 @@ public class Main extends HttpServlet {
         try {
             URL finalGitHubURL = new URL(gitHubApiURL.toString() + "/repos/" + gitHubIssue.getToRepo_Owner() + "/" + gitHubIssue.getToRepo_RepoName());
             try {
-                HttpURLConnection connection = (HttpURLConnection) finalGitHubURL.openConnection();
+                //HttpURLConnection connection = (HttpURLConnection) finalGitHubURL.openConnection();
 
                 // build the request body
                 String query = gson.toJson(issue);
 
                 // request header
-                connection.setRequestMethod("POST");
+                /*connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Content-Encoding", "UTF-8");
                 connection.setRequestProperty("Content-Length", Integer.toString(query.length()));
@@ -180,22 +181,16 @@ public class Main extends HttpServlet {
                 connection.setDoOutput(true);
                 connection.getOutputStream().write(query.getBytes("UTF8"));
                 connection.getOutputStream().flush();
-                connection.getOutputStream().close();
-                response.setStatus(connection.getResponseCode());
+                connection.getOutputStream().close();*/
+                Request gitHubRequest = Request.Post(finalGitHubURL.toString())
+                        .addHeader("Authorization", "token " + properties.getProperty("GitHub_AccessToken"))
+                        .bodyString(query, ContentType.APPLICATION_JSON);
+                Response gitHubResponse = gitHubRequest.execute();
+
+                response.setStatus(gitHubResponse.returnResponse().getStatusLine().getStatusCode());
                 // check the server response
-                int responseCode = connection.getResponseCode();
-                StringBuilder responseBody = new StringBuilder();
-
-                BufferedReader br;
-                if (200 <= responseCode && responseCode <= 299) {
-                    br = new BufferedReader(new InputStreamReader((connection.getInputStream())));
-                } else {
-                    br = new BufferedReader(new InputStreamReader((connection.getErrorStream())));
-                }
-
-                while ((line = br.readLine()) != null) {
-                    responseBody.append(line);
-                }
+                int responseCode = gitHubResponse.returnResponse().getStatusLine().getStatusCode();
+                String responseBody = gitHubResponse.returnContent().asString();
 
                 FOKLogger.info(ReportingDialog.class.getName(), "Submitted GitHub issue, response code from VatbubGitReports-Server: " + responseCode);
                 FOKLogger.info(ReportingDialog.class.getName(), "Response from Server:\n" + responseBody);
