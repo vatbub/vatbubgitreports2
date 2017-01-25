@@ -23,11 +23,10 @@ package com.github.vatbub.vatbubgitreports;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import logging.FOKLogger;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.IssueService;
 import reporting.GitHubIssue;
+import view.reporting.ReportingDialog;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -38,10 +37,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
+import java.util.logging.Level;
 
 public class Main extends HttpServlet {
     private static Properties properties = null;
+    private static URL gitHubApiURL;
+
+    static {
+        try {
+            gitHubApiURL = new URL("https://api.github.com/");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -123,10 +135,6 @@ public class Main extends HttpServlet {
             return;
         }
 
-        // Authenticate on GitHub
-        GitHubClient client = new GitHubClient();
-        client.setCredentials(properties.getProperty("GitHub_UserName"), properties.getProperty("GitHub_Password"));
-
         // Convert the issue object
         Issue issue = new Issue();
         issue.setTitle(gitHubIssue.getTitle());
@@ -153,7 +161,27 @@ public class Main extends HttpServlet {
 
         // send the issue to GitHub
         try {
-            new IssueService(client).createIssue(gitHubIssue.getToRepo_Owner(), gitHubIssue.getToRepo_RepoName(), issue);
+            URL finalGitHubURL = new URL(gitHubApiURL.toString() + "/repos/" + gitHubIssue.getToRepo_Owner() + "/" + gitHubIssue.getToRepo_RepoName());
+            try {
+                HttpURLConnection connection = (HttpURLConnection) finalGitHubURL.openConnection();
+
+                // build the request body
+                String query = gson.toJson(issue);
+
+                // request header
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Content-Encoding", "UTF-8");
+                connection.setRequestProperty("Content-Length", Integer.toString(query.length()));
+                connection.setRequestProperty("Authorization", "token " + properties.getProperty("GitHub_AccessToken"));
+                connection.setDoOutput(true);
+                connection.getOutputStream().write(query.getBytes("UTF8"));
+                connection.getOutputStream().flush();
+                connection.getOutputStream().close();
+                response.setStatus(connection.getResponseCode());
+            } catch (IOException e) {
+                FOKLogger.log(ReportingDialog.class.getName(), Level.SEVERE, "An error occurred", e);
+            }
             res.passed = true;
         } catch (IOException e) {
             e.printStackTrace();
