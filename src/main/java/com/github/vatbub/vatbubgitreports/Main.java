@@ -192,15 +192,17 @@ public class Main extends HttpServlet {
                         .bodyString(query, ContentType.APPLICATION_JSON);
                 Response gitHubResponse = gitHubRequest.execute();*/
 
-                CloseableHttpClient httpclient = HttpClients.createDefault();
+                CloseableHttpClient httpClient = HttpClients.createDefault();
                 HttpPost httpPost = new HttpPost(finalGitHubURL.toString());
+                System.out.println("The following request will be sent to GitHub:");
+                httpPost.getEntity().writeTo(System.out);
                 httpPost.addHeader("Authorization", "token " + properties.getProperty("GitHub_AccessToken"));
                 HttpEntity entity = new ByteArrayEntity(query.getBytes("UTF-8"));
                 httpPost.setEntity(entity);
 
                 int responseCode;
                 String responseBody;
-                try (CloseableHttpResponse gitHubResponse = httpclient.execute(httpPost)) {
+                try (CloseableHttpResponse gitHubResponse = httpClient.execute(httpPost)) {
                     // check the server response
                     HttpEntity gitHubResponseEntity = gitHubResponse.getEntity();
                     responseCode = gitHubResponse.getStatusLine().getStatusCode();
