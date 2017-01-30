@@ -130,6 +130,10 @@ public class Main extends HttpServlet {
             body = body + "Log location: " + gitHubIssue.getLogLocation() + "\n";
             metadataGiven = true;
         }
+        if (gitHubIssue.getThrowable()!=null){
+            body = body + "Exception stacktrace:\n" + ExceptionUtils.getFullStackTrace(gitHubIssue.getThrowable()) + "\n";
+            metadataGiven = true;
+        }
         if (metadataGiven) {
             body = body + "----------------------------------" + "\n\nDESCRIPTION:\n";
         }
