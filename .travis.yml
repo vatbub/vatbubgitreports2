@@ -28,3 +28,4 @@ deploy:
   app: vatbubgitreports
   on:
     repo: vatbub/vatbubgitreports2
+
