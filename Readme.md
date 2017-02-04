@@ -43,3 +43,6 @@ As we did not implement OAuth 2 yet, you need to get your Access Key manually.
 3. Now open the `/target/`-folder and copy the file called `vatbubgitreports.war`.
 4. Open the folder of your TomCat installation and go into the subfolder called `webapps` and restart the server.
 5. The base url of your instance will be `http://host:port/vatbubgitreports`
+
+## Contributing
+Contributions of any kind are very welcome. Just fork and submit a Pull Request and we will be happy to merge. Just keep in mind that we use [Issue driven development](https://github.com/vatbub/defaultRepo/wiki/Issue-driven-development).
