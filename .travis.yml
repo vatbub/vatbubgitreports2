@@ -34,13 +34,13 @@ notifications:
     - vatbub123+travisbuildnotification@googlemail.com
     on_success: never
 on_failure: always
-deploy:
-  provider: heroku
-  app: vatbubgitreports
-  on:
-    repo: vatbub/vatbubgitreports2
-  api_key:
-    secure: ts25e+ttMvRoWDhqwHLrU50f3LtprrFOFile+wC2G2a736Jt0wVW5Y6eSR34uvtJ3YO/wsos07dEWuJuQHR8XAzTd7tXsbOjrLW95StSr+7CpWWQ5ZVI7pmI9shgpckQYzs8gmYG8alL0k2KASWFF+P2kolC7cdefbz+tsfCWK45T6tBcKI9R/dRTiK5Ja+tOfqKx8vX8FOqSUpetMDTgpwoEnTaIIoB+ZGSDxxtBx9DHxRgqjpS9LLdrE34ToBXwj0MoJBXcJeF2Et5trovvMlHV7eeAh8uHLiNUZMGZKejEp5cDw3b1rTDY6pp1sQfmT7Kzm+nNkX+IxAU+R++H9jzH5a43/jsJTiqZsGbLe9+oO1USgT+ZkEQ/RDf8WEFIENOvVeLReU4oCzDHv/MM7Sl5jatnoATJ4opViX2RhY+A6nwzssKtTN7fwQStY6sdAmllriL5oTRoyV6XZzOG56sC5ZTNmw/qxJHuALWq6n5aQLMufF4HCAT92+/XXPD1aGTZYI6EaaRasZfE5F0yCz2Xo74upwwcE2YwVjws37R7f7WgfIbQZQg36Q7H/F8U6QzWbKmac4/I6s3ykV3oAma/M8NBK9EMxNIKU6CBfLjFugVIuP98os8k4vF1OkWdbXY9eu8f6wRl4tj/viekC7Aoayfs+zF4lhZYsPsewQ=
+#deploy:
+#  provider: heroku
+#  app: vatbubgitreports
+#  on:
+#    repo: vatbub/vatbubgitreports2
+#  api_key:
+#    secure: ts25e+ttMvRoWDhqwHLrU50f3LtprrFOFile+wC2G2a736Jt0wVW5Y6eSR34uvtJ3YO/wsos07dEWuJuQHR8XAzTd7tXsbOjrLW95StSr+7CpWWQ5ZVI7pmI9shgpckQYzs8gmYG8alL0k2KASWFF+P2kolC7cdefbz+tsfCWK45T6tBcKI9R/dRTiK5Ja+tOfqKx8vX8FOqSUpetMDTgpwoEnTaIIoB+ZGSDxxtBx9DHxRgqjpS9LLdrE34ToBXwj0MoJBXcJeF2Et5trovvMlHV7eeAh8uHLiNUZMGZKejEp5cDw3b1rTDY6pp1sQfmT7Kzm+nNkX+IxAU+R++H9jzH5a43/jsJTiqZsGbLe9+oO1USgT+ZkEQ/RDf8WEFIENOvVeLReU4oCzDHv/MM7Sl5jatnoATJ4opViX2RhY+A6nwzssKtTN7fwQStY6sdAmllriL5oTRoyV6XZzOG56sC5ZTNmw/qxJHuALWq6n5aQLMufF4HCAT92+/XXPD1aGTZYI6EaaRasZfE5F0yCz2Xo74upwwcE2YwVjws37R7f7WgfIbQZQg36Q7H/F8U6QzWbKmac4/I6s3ykV3oAma/M8NBK9EMxNIKU6CBfLjFugVIuP98os8k4vF1OkWdbXY9eu8f6wRl4tj/viekC7Aoayfs+zF4lhZYsPsewQ=
 before_install:
 - openssl aes-256-cbc -K $encrypted_5b0eaacdfda3_key -iv $encrypted_5b0eaacdfda3_iv
   -in github_deploy_key.enc -out github_deploy_key -d
