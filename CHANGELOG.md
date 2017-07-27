@@ -1,5 +1,13 @@
 # Change Log
 
+## [Unreleased](https://github.com/vatbub/vatbubgitreports2/tree/HEAD)
+
+[Full Changelog](https://github.com/vatbub/vatbubgitreports2/compare/githubjavaapi...HEAD)
+
+**Closed issues:**
+
+- API Documentation? [\#1](https://github.com/vatbub/vatbubgitreports2/issues/1)
+
 ## [githubjavaapi](https://github.com/vatbub/vatbubgitreports2/tree/githubjavaapi) (2017-01-24)
 
 
