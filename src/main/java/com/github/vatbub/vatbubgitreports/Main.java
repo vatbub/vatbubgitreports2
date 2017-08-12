@@ -21,15 +21,15 @@ package com.github.vatbub.vatbubgitreports;
  */
 
 
+import com.github.vatbub.common.internet.Error;
+import com.github.vatbub.common.internet.Internet;
+import com.github.vatbub.common.view.reporting.GitHubIssue;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import common.internet.Error;
-import common.internet.Internet;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
-import reporting.GitHubIssue;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -114,9 +114,6 @@ public class Main extends HttpServlet {
         client.setOAuth2Token(System.getenv("GITHUB_ACCESS_TOKEN"));
 
 
-
-
-
         // Convert the issue object
         Issue issue = new Issue();
         issue.setTitle(gitHubIssue.getTitle());
@@ -134,11 +131,11 @@ public class Main extends HttpServlet {
             body = body + "Log location: " + gitHubIssue.getLogLocation() + "\n";
             metadataGiven = true;
         }
-        if (gitHubIssue.getScreenshotLocation()!=null){
+        if (gitHubIssue.getScreenshotLocation() != null) {
             body = body + "Screenshot location: " + gitHubIssue.getScreenshotLocation() + "\n";
             metadataGiven = true;
         }
-        if (gitHubIssue.getThrowable()!=null){
+        if (gitHubIssue.getThrowable() != null) {
             body = body + "Exception stacktrace:\n" + ExceptionUtils.getFullStackTrace(gitHubIssue.getThrowable()) + "\n";
             metadataGiven = true;
         }
