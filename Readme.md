@@ -1,4 +1,4 @@
-#VatbubGitReports
+# VatbubGitReports
 This project is inspired by the website [GitReports](gitreports.com) which allows users to post issues on GitHub without creating a GitHub account. This lets any user of your app report bugs and feature requests in no time.
 The problem with GitReports was however that it randomly returned 404 errors which is why I decided to reimplement it.
 
