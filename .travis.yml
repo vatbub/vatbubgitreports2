@@ -5,12 +5,15 @@ jdk:
 addons:
   apt:
     packages:
-    - oracle-java8-installer
     - maven
 cache:
   directories:
   - $HOME/.m2
-install: mvn -v
+install:
+- mvn -v
+- wget https://s3.eu-central-1.amazonaws.com/vatbubjdk/jdk-8u191-linux-x64.tar.gz -nv
+- tar -xf jdk-8u191-linux-x64.tar.gz
+- export JAVA_HOME=/home/travis/build/vatbub/vatbubgitreports2/jdk1.8.0_191/
 script: mvn package
 after_success:
   - git checkout master
