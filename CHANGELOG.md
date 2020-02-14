@@ -4,9 +4,9 @@
 
 [Full Changelog](https://github.com/vatbub/vatbubgitreports2/compare/githubjavaapi...HEAD)
 
-**Closed issues:**
+**Merged pull requests:**
 
-- API Documentation? [\#1](https://github.com/vatbub/vatbubgitreports2/issues/1)
+- Bump parentPom from 1.0.1-SNAPSHOT to 1.0.3-SNAPSHOT [\#11](https://github.com/vatbub/vatbubgitreports2/pull/11) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 
 ## [githubjavaapi](https://github.com/vatbub/vatbubgitreports2/tree/githubjavaapi) (2017-01-24)
 
