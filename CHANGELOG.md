@@ -11,6 +11,9 @@
 **Merged pull requests:**
 
 - Bump parentPom from 1.0.1-SNAPSHOT to 1.0.3-SNAPSHOT [\#11](https://github.com/vatbub/vatbubgitreports2/pull/11) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+- Bump maven-dependency-plugin from 2.3 to 3.1.1 [\#7](https://github.com/vatbub/vatbubgitreports2/pull/7) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+- Bump common.internet from 0.1.2-SNAPSHOT to 0.1.6-SNAPSHOT [\#6](https://github.com/vatbub/vatbubgitreports2/pull/6) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
+- Bump javax.mail-api from 1.6.0 to 1.6.2 [\#2](https://github.com/vatbub/vatbubgitreports2/pull/2) ([dependabot-preview[bot]](https://github.com/apps/dependabot-preview))
 
 ## [githubjavaapi](https://github.com/vatbub/vatbubgitreports2/tree/githubjavaapi) (2017-01-24)
 
